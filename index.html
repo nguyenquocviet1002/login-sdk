@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://huudinh.github.io/assets/sass/lib.min.css">
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+
+<body>
+  <header class="header">
+    <div class="button-login" id="login">Đăng nhập</div>
+    <div class="name">Xin chào <span class="boxName"></span></div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="thumb">
+        <img src="https://flowbite.com/docs/images/blog/image-1.jpg" alt="">
+      </div>
+      <div class="content">
+        <div class="title">Noteworthy technology acquisitions 2021</div>
+        <div class="heart"><img src="images/heart.png" alt=""></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    //<!-- Add the Facebook SDK for Javascript -->
+    (function (d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) { return; }
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+
+    window.fbAsyncInit = function () {
+      //<!-- Initialize the SDK with your app and the Graph API version for your app -->
+      FB.init({
+        appId: '1975015932986497',
+        xfbml: true,
+        version: 'v22.0'
+      });
+
+      FB.getLoginStatus(response => {
+        statusChangeCallback(response);
+      })
+    };
+
+    const heart = document.querySelector('.heart');
+
+    // hàm thêm class active vào heart
+    const activeHeart = () => {
+      if(heart.classList.contains('active')){
+        heart.classList.remove('active');
+        localStorage.setItem('heart', '');
+      } else {
+        heart.classList.add('active');
+        localStorage.setItem('heart', 'active');
+      }
+    }
+
+    // hàm kiểm tra trạng thái đăng nhập
+    const statusChangeCallback = response => {
+      if(response.status === 'connected'){
+        statusInfo();
+        document.querySelector('.button-login').style.display = 'none';
+        document.querySelector('.name').style.display = 'block';
+        heart.removeEventListener('click', loginFb);
+        heart.addEventListener('click', activeHeart);
+      } else {
+        document.querySelector('.button-login').style.display = 'block';
+        document.querySelector('.name').style.display = 'none';
+        heart.addEventListener('click', loginFb);
+        heart.removeEventListener('click', activeHeart);
+      }
+    }
+
+
+    // hàm lấy thông tin người dùng
+    const statusInfo = () => {
+      FB.api('/me', response => {
+        document.querySelector('.boxName').innerHTML = response.name;
+      });
+    }
+
+    // hàm sử lý đăng nhập
+    const loginFb = () => {
+      FB.login(function(response) {
+        // Person is now logged in
+        statusChangeCallback(response);
+      })
+    }
+
+    // gán sự kiện click đăng nhập vào button login
+    document.getElementById('login').addEventListener('click', loginFb);
+    // kiểm tra local storage xem biến heart có active không. Nếu có thì thêm class active vào heart
+    localStorage.getItem('heart') === 'active' && heart.classList.add('active');
+
+  </script>
+
+</body>
+
+</html>
