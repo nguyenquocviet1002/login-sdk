@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Login</title>
+    <link rel="stylesheet" href="https://huudinh.github.io/assets/sass/lib.min.css">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+
+<body>
+    <header class="header">
+        <button class="button-login">Login with Facebook</button>
+
+       <div class="name"></div>
+    </header>
+
+    <script>
+        // load sdk
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk')
+        );
+
+        // khoi tao sdk
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '1975015932986497',
+                xfbml: true,
+                version: 'v22.0'
+            });
+        };
+
+        // ham show thong tin user
+        const showInfoUser = () => {
+            FB.api('/me', {fields: 'name, email'}, function(response) {
+                document.querySelector('.name').textContent = response.name;
+            });
+        };
+
+        // ham xu li dang nhap
+        const fnLogin = () => {
+            FB.login(function (response) {
+                if (response.authResponse) {
+                    console.log('Xin chao');
+                    showInfoUser();
+                } else {
+                    console.log('User chua dang nhap hoac khong co quyen truy cap.');
+                }
+            });
+        };
+
+        // gan su kien vao button login
+        document.querySelector('.button-login').addEventListener('click', fnLogin);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Login</title>
+    <link rel="stylesheet" href="https://huudinh.github.io/assets/sass/lib.min.css">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+
+<body>
+    <header class="header">
+        <button class="button-login">Login with Facebook</button>
+
+       <div class="name" style="display: none;"></div>
+    </header>
+
+    <main>
+        <div class="card">
+            <div class="thumb"><img src="https://flowbite.com/docs/images/blog/image-1.jpg" alt=""></div>
+            <div class="content">
+                <div class="title">Lorem ipsum dolor sit amet consectetur adipisicing elit.</div>
+                <div class="heart"><img src="../../images/heart.png" alt=""></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // load sdk
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk')
+        );
+
+        // khoi tao sdk
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '1975015932986497',
+                xfbml: true,
+                version: 'v22.0'
+            });
+
+            FB.getLoginStatus(function(response) {
+                showInfoUser();
+            });
+        };
+
+        // ham show thong tin user
+        const showInfoUser = () => {
+            FB.api('/me', {fields: 'name, email'}, function(response) {
+                document.querySelector('.button-login').style.display = 'none';
+                document.querySelector('.name').style.display = 'block';
+                document.querySelector('.name').textContent = `Xin chào ${response.name}`;
+            });
+        };
+
+        // ham xu li thong tin sau khi dang nhap
+        const checkStatus = (response) => {
+            if(response.status === "connected"){
+                showInfoUser();
+            } else {
+                document.querySelector('.button-login').style.display = 'block';
+                document.querySelector('.name').style.display = 'none';
+            }
+        }
+
+        // ham xu li dang nhap
+        const fnLogin = () => {
+            FB.login(function (response) {
+                if (response.authResponse) {
+                    console.log('Xin chao');
+                    showInfoUser();
+                } else {
+                    console.log('User chua dang nhap hoac khong co quyen truy cap.');
+                }
+            });
+        };
+
+        // gan su kien vao button login
+        document.querySelector('.button-login').addEventListener('click', fnLogin);
+    </script>
+</body>
+
+</html>

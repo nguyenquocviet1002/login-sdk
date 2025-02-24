@@ -4,15 +4,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Facebook Login</title>
   <link rel="stylesheet" href="https://huudinh.github.io/assets/sass/lib.min.css">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 
 <body>
   <header class="header">
-    <div class="button-login" id="login">Đăng nhập</div>
-    <div class="name">Xin chào <span class="boxName"></span></div>
+    <!-- Nút đăng nhập -->
+    <button id="fb-login" class="button-login">Login with Facebook</button>
+
+
+    <!-- Hiển thị thông tin user -->
+    <div id="user-info" style="display:none;">
+      <h5 id="user-name"></h5>
+    </div>
   </header>
 
   <main>
@@ -28,7 +34,7 @@
   </main>
 
   <script>
-    //<!-- Add the Facebook SDK for Javascript -->
+    // load sdk facebook
     (function (d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) { return; }
@@ -39,13 +45,14 @@
 
 
     window.fbAsyncInit = function () {
-      //<!-- Initialize the SDK with your app and the Graph API version for your app -->
+      // khởi tạo sdk facebook
       FB.init({
         appId: '1975015932986497',
         xfbml: true,
         version: 'v22.0'
       });
 
+      // kiểm tra trạng thái đăng nhập
       FB.getLoginStatus(response => {
         statusChangeCallback(response);
       })
@@ -67,14 +74,12 @@
     // hàm kiểm tra trạng thái đăng nhập
     const statusChangeCallback = response => {
       if(response.status === 'connected'){
-        statusInfo();
+        showUserInfo();
         document.querySelector('.button-login').style.display = 'none';
-        document.querySelector('.name').style.display = 'block';
         heart.removeEventListener('click', loginFb);
         heart.addEventListener('click', activeHeart);
       } else {
         document.querySelector('.button-login').style.display = 'block';
-        document.querySelector('.name').style.display = 'none';
         heart.addEventListener('click', loginFb);
         heart.removeEventListener('click', activeHeart);
       }
@@ -82,22 +87,27 @@
 
 
     // hàm lấy thông tin người dùng
-    const statusInfo = () => {
+    const showUserInfo = () => {
       FB.api('/me', response => {
-        document.querySelector('.boxName').innerHTML = response.name;
+        document.getElementById('user-info').style.display = 'block';
+        document.getElementById('user-name').textContent = `Xin chào ${response.name}`;
       });
     }
 
     // hàm sử lý đăng nhập
     const loginFb = () => {
       FB.login(function(response) {
-        // Person is now logged in
-        statusChangeCallback(response);
-      })
+        if(response.authResponse) {
+          // Person is now logged in
+          statusChangeCallback(response);
+        } else {
+          console.log('User cancelled login');
+        }
+      }, {scope: 'public_profile', return_scopes: true})
     }
 
     // gán sự kiện click đăng nhập vào button login
-    document.getElementById('login').addEventListener('click', loginFb);
+    document.getElementById('fb-login').addEventListener('click', loginFb);
     // kiểm tra local storage xem biến heart có active không. Nếu có thì thêm class active vào heart
     localStorage.getItem('heart') === 'active' && heart.classList.add('active');
 
